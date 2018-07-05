@@ -205,10 +205,10 @@ public class SocketManager
     {
         byte[] _tmpBuff = new byte[tmpSocketData._buffLength];
         byte[] _tmpBuffLength = BitConverter.GetBytes(tmpSocketData._buffLength);
-        byte[] _tmpDataLenght = BitConverter.GetBytes((UInt16)tmpSocketData._protocallType);
+        byte[] _tmpType = BitConverter.GetBytes((UInt16)tmpSocketData._protocallType);
 
         Array.Copy(_tmpBuffLength, 0, _tmpBuff, 0, Constants.HEAD_DATA_LEN);//缓存总长度
-        Array.Copy(_tmpDataLenght, 0, _tmpBuff, Constants.HEAD_DATA_LEN, Constants.HEAD_TYPE_LEN);//协议类型
+        Array.Copy(_tmpType, 0, _tmpBuff, Constants.HEAD_DATA_LEN, Constants.HEAD_TYPE_LEN);//协议类型
         Array.Copy(tmpSocketData._data, 0, _tmpBuff, Constants.HEAD_LEN, tmpSocketData._dataLength);//协议数据
 
         return _tmpBuff;
