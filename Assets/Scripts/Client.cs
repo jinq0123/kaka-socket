@@ -37,11 +37,11 @@ public class Client : MonoBehaviour {
 
     private void RegeditControl()
     {
-        BtnRoot.FindChild("Btn_Connect").GetComponent<Button>().onClick.AddListener(OnButton_Connect);
-        BtnRoot.FindChild("Btn_DisConnect").GetComponent<Button>().onClick.AddListener(OnButton_DisConnect);
-        BtnRoot.FindChild("Btn_PostEvent_NoticeInfo").GetComponent<Button>().onClick.AddListener(OnButton_PostEvent);
-        BtnRoot.FindChild("Btn_SendMsg_Protobuf").GetComponent<Button>().onClick.AddListener(OnButton_ProtoBuff_SendMsg);
-        BtnRoot.FindChild("Btn_SendMsg_Binary").GetComponent<Button>().onClick.AddListener(OnButton_Binary_SendMsg);
+        BtnRoot.Find("Btn_Connect").GetComponent<Button>().onClick.AddListener(OnButton_Connect);
+        BtnRoot.Find("Btn_DisConnect").GetComponent<Button>().onClick.AddListener(OnButton_DisConnect);
+        BtnRoot.Find("Btn_PostEvent_NoticeInfo").GetComponent<Button>().onClick.AddListener(OnButton_PostEvent);
+        BtnRoot.Find("Btn_SendMsg_Protobuf").GetComponent<Button>().onClick.AddListener(OnButton_ProtoBuff_SendMsg);
+        BtnRoot.Find("Btn_SendMsg_Binary").GetComponent<Button>().onClick.AddListener(OnButton_Binary_SendMsg);
     }
 
 
