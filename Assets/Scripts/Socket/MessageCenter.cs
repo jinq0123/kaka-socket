@@ -10,28 +10,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System;
 
-public struct sEvent_GameLogicData
-{
-    public eGameLogicEventType _eventType;
-    public object _eventData;
-}
-
 public struct sEvent_NetMessageData
 {
     public UInt16 _eventType;
     public byte[] _eventData;
 }
 
-public delegate void Callback_GameLogic_Handle(object _data);
 public delegate void Callback_NetMessage_Handle(byte[] _data);
 
 public class MessageCenter : SingletonMonoBehaviour<MessageCenter>
 {
     private Dictionary<UInt16, Callback_NetMessage_Handle> _netMessage_EventList = new Dictionary<UInt16, Callback_NetMessage_Handle>();
     public Queue<sEvent_NetMessageData> _netMessageDataQueue = new Queue<sEvent_NetMessageData>();
-
-    private Dictionary<eGameLogicEventType, Callback_GameLogic_Handle> _gameLogic_EventList = new Dictionary<eGameLogicEventType, Callback_GameLogic_Handle>();
-    public Queue<sEvent_GameLogicData> _gameLogicDataQueue = new Queue<sEvent_GameLogicData>();
 
     //添加网络事件观察者
     public void addObsever(UInt16 _protocalType, Callback_NetMessage_Handle _callback)
@@ -57,54 +47,9 @@ public class MessageCenter : SingletonMonoBehaviour<MessageCenter>
             }
         }
     }
-    
-
-    //添加普通事件观察者
-	public void AddEventListener(eGameLogicEventType _eventType, Callback_GameLogic_Handle _callback)
-    {
-        if (_gameLogic_EventList.ContainsKey(_eventType))
-        {
-            _gameLogic_EventList[_eventType] += _callback;
-        }
-        else
-        {
-            _gameLogic_EventList.Add(_eventType, _callback);
-        }
-    }
-    //删除普通事件观察者
-	public void RemoveEventListener(eGameLogicEventType _eventType, Callback_GameLogic_Handle _callback)
-    {
-        if (_gameLogic_EventList.ContainsKey(_eventType))
-        {
-            _gameLogic_EventList[_eventType] -= _callback;
-            if (_gameLogic_EventList[_eventType] == null)
-            {
-                _gameLogic_EventList.Remove(_eventType);
-            }
-        }
-    }
-    //推送消息
-	public void PostEvent(eGameLogicEventType _eventType, object data = null)
-    {
-        if (_gameLogic_EventList.ContainsKey(_eventType))
-        {
-            _gameLogic_EventList[_eventType](data);
-        }
-    }
-    
-
 
     void Update()
     {
-        while (_gameLogicDataQueue.Count > 0)
-        {
-            sEvent_GameLogicData tmpGameLogicData = _gameLogicDataQueue.Dequeue();
-            if (_gameLogic_EventList.ContainsKey(tmpGameLogicData._eventType))
-            {
-                _gameLogic_EventList[tmpGameLogicData._eventType](tmpGameLogicData._eventData);
-            }
-        }
-
         while (_netMessageDataQueue.Count > 0)
         {
             lock (_netMessageDataQueue)

@@ -18,14 +18,12 @@ public class Client : MonoBehaviour {
 
     void OnEnable()
     {
-        MessageCenter.Instance.AddEventListener(eGameLogicEventType.NoticeInfo, CallBack_PoseEvent);
         MessageCenter.Instance.addObsever(ProtoID.sc_protobuf_login, CallBack_ProtoBuff_LoginServer);
         MessageCenter.Instance.addObsever(ProtoID.sc_binary_login, CallBack_Binary_LoginServer);
     }
 
     void OnDisable()
     {
-        MessageCenter.Instance.RemoveEventListener(eGameLogicEventType.NoticeInfo, CallBack_PoseEvent);
         MessageCenter.Instance.removeObserver(ProtoID.sc_protobuf_login, CallBack_ProtoBuff_LoginServer);
         MessageCenter.Instance.removeObserver(ProtoID.sc_binary_login, CallBack_Binary_LoginServer);
     }
@@ -39,7 +37,6 @@ public class Client : MonoBehaviour {
     {
         BtnRoot.Find("Btn_Connect").GetComponent<Button>().onClick.AddListener(OnButton_Connect);
         BtnRoot.Find("Btn_DisConnect").GetComponent<Button>().onClick.AddListener(OnButton_DisConnect);
-        BtnRoot.Find("Btn_PostEvent_NoticeInfo").GetComponent<Button>().onClick.AddListener(OnButton_PostEvent);
         BtnRoot.Find("Btn_SendMsg_Protobuf").GetComponent<Button>().onClick.AddListener(OnButton_ProtoBuff_SendMsg);
         BtnRoot.Find("Btn_SendMsg_Binary").GetComponent<Button>().onClick.AddListener(OnButton_Binary_SendMsg);
     }
@@ -53,12 +50,6 @@ public class Client : MonoBehaviour {
     private void OnButton_DisConnect()
     {
         SocketManager.Instance.Close();
-    }
-
-    private void OnButton_PostEvent()
-    {
-        string _content = "GameLogicEvent";
-        MessageCenter.Instance.PostEvent(eGameLogicEventType.NoticeInfo, _content);
     }
 
     private void OnButton_ProtoBuff_SendMsg()
