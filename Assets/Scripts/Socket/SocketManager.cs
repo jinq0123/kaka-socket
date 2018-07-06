@@ -189,8 +189,6 @@ public class SocketManager
     private sSocketData BytesToSocketData(eProtocalCommand _protocalType, byte[] _data)
     {
         sSocketData tmpSocketData = new sSocketData();
-        tmpSocketData._buffLength = Constants.HEAD_LEN + _data.Length;
-        tmpSocketData._dataLength = _data.Length;
         tmpSocketData._protocallType = _protocalType;
         tmpSocketData._data = _data;
         return tmpSocketData;
@@ -203,13 +201,16 @@ public class SocketManager
     /// <returns></returns>
     private byte[] SocketDataToBytes(sSocketData tmpSocketData)
     {
-        byte[] _tmpBuff = new byte[tmpSocketData._buffLength];
-        byte[] _tmpBuffLength = BitConverter.GetBytes(tmpSocketData._buffLength);
+        int dataLength = tmpSocketData._data.Length;
+        int buffLength = dataLength + Constants.HEAD_LEN;
+        byte[] _tmpBuff = new byte[buffLength];
+        int msgLength = dataLength + Constants.HEAD_TYPE_LEN;
+        byte[] _tmpMsgLength = BitConverter.GetBytes(msgLength);
         byte[] _tmpType = BitConverter.GetBytes((UInt16)tmpSocketData._protocallType);
 
-        Array.Copy(_tmpBuffLength, 0, _tmpBuff, 0, Constants.HEAD_DATA_LEN);//缓存总长度
-        Array.Copy(_tmpType, 0, _tmpBuff, Constants.HEAD_DATA_LEN, Constants.HEAD_TYPE_LEN);//协议类型
-        Array.Copy(tmpSocketData._data, 0, _tmpBuff, Constants.HEAD_LEN, tmpSocketData._dataLength);//协议数据
+        Array.Copy(_tmpMsgLength, 0, _tmpBuff, 0, Constants.HEAD_MSG_LEN);//缓存总长度
+        Array.Copy(_tmpType, 0, _tmpBuff, Constants.HEAD_MSG_LEN, Constants.HEAD_TYPE_LEN);//协议类型
+        Array.Copy(tmpSocketData._data, 0, _tmpBuff, Constants.HEAD_LEN, dataLength);//协议数据
 
         return _tmpBuff;
     }

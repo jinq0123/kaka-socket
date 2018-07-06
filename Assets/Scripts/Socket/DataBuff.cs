@@ -5,13 +5,17 @@ using UnityEngine;
 //常量数据
 public class Constants
 {
-    //消息：数据总长度(4byte) + 数据类型(2byte) + 数据(N byte)
-    public static int HEAD_DATA_LEN = 4;
+    //消息：消息长度(4byte) + 消息[数据类型(2byte) + 数据(N byte)]
+    //消息长度为 2+N, 即不包括自身的4个字节
+    public static int HEAD_MSG_LEN = 4;
     public static int HEAD_TYPE_LEN = 2;
     public static int HEAD_LEN//6byte
     {
-        get { return HEAD_DATA_LEN + HEAD_TYPE_LEN; }
+        get { return HEAD_MSG_LEN + HEAD_TYPE_LEN; }
     }
+
+    // 最大消息长度
+    public static int MAX_MSG_LEN = 4 * 1024 * 1024;  // 4M
 }
 
 /// <summary>
@@ -22,8 +26,6 @@ public struct sSocketData
 {
     public byte[] _data;
     public eProtocalCommand _protocallType;
-    public int _buffLength;
-    public int _dataLength;
 }
 
 /// <summary>
@@ -35,8 +37,7 @@ public class DataBuffer
     private int _minBuffLen;
     private byte[] _buff;
     private int _curBuffPosition;
-    private int _buffLength = 0;
-    private int _dataLength;
+    private UInt32 _msgLength = 0;  // dataLength + 2
     private UInt16 _protocalType;
 
     /// <summary>
@@ -79,21 +80,19 @@ public class DataBuffer
     }
 
     /// <summary>
-    /// 更新数据长度
+    /// 更新消息长度和类型
     /// </summary>
-    public void UpdateDataLength()
+    public void UpdateMsgLengthAndType()
     {
-        if (_dataLength == 0 && _curBuffPosition >= Constants.HEAD_LEN)
+        if (_msgLength == 0 && _curBuffPosition >= Constants.HEAD_LEN)
         {
-            byte[] tmpDataLen = new byte[Constants.HEAD_DATA_LEN];
-            Array.Copy(_buff, 0, tmpDataLen, 0, Constants.HEAD_DATA_LEN);
-            _buffLength = BitConverter.ToInt32(tmpDataLen, 0);
+            byte[] tmpMsgLen = new byte[Constants.HEAD_MSG_LEN];
+            Array.Copy(_buff, 0, tmpMsgLen, 0, Constants.HEAD_MSG_LEN);
+            _msgLength = BitConverter.ToUInt32(tmpMsgLen, 0);
 
             byte[] tmpProtocalType = new byte[Constants.HEAD_TYPE_LEN];
-            Array.Copy(_buff, Constants.HEAD_DATA_LEN, tmpProtocalType, 0, Constants.HEAD_TYPE_LEN);
+            Array.Copy(_buff, Constants.HEAD_MSG_LEN, tmpProtocalType, 0, Constants.HEAD_TYPE_LEN);
             _protocalType = BitConverter.ToUInt16(tmpProtocalType, 0);
-
-            _dataLength = _buffLength - Constants.HEAD_LEN;
         }
     }
 
@@ -106,30 +105,38 @@ public class DataBuffer
     {
         _tmpSocketData = new sSocketData();
 
-        if (_buffLength <= 0)
+        if (_msgLength == 0)
         {
-            UpdateDataLength();
+            UpdateMsgLengthAndType();
+            if (_msgLength == 0)
+            {
+                return false;
+            }
+            // XXX if (_msgLength > Constants.MAX_MSG_LEN)
         }
 
-        if (_buffLength > 0 && _curBuffPosition >= _buffLength)
+        if (_curBuffPosition < _msgLength + Constants.HEAD_MSG_LEN)
         {
-            _tmpSocketData._buffLength = _buffLength;
-            _tmpSocketData._dataLength = _dataLength;
-            _tmpSocketData._protocallType = (eProtocalCommand)_protocalType;
-            _tmpSocketData._data = new byte[_dataLength];
-            Array.Copy(_buff, Constants.HEAD_LEN, _tmpSocketData._data, 0, _dataLength);
-            _curBuffPosition -= _buffLength;
-            byte[] _tmpBuff = new byte[_curBuffPosition < _minBuffLen ? _minBuffLen : _curBuffPosition];
-            Array.Copy(_buff, _buffLength, _tmpBuff, 0, _curBuffPosition);
-            _buff = _tmpBuff;
-
-
-            _buffLength = 0;
-            _dataLength = 0;
-            _protocalType = 0;
-            return true;
+            return false;
         }
-        return false;
-    }
-    
+
+        int dataLength = (int)_msgLength - Constants.HEAD_TYPE_LEN;
+        if (dataLength < 0)
+        {
+            return false;
+        }
+
+        _tmpSocketData._protocallType = (eProtocalCommand)_protocalType;
+        _tmpSocketData._data = new byte[dataLength];
+        Array.Copy(_buff, Constants.HEAD_LEN, _tmpSocketData._data, 0, dataLength);
+        int doneLength = (int)_msgLength + Constants.HEAD_MSG_LEN;
+        _curBuffPosition -= doneLength;
+        byte[] _tmpBuff = new byte[_curBuffPosition < _minBuffLen ? _minBuffLen : _curBuffPosition];
+        Array.Copy(_buff, doneLength, _tmpBuff, 0, _curBuffPosition);
+        _buff = _tmpBuff;
+
+        _msgLength = 0;
+        _protocalType = 0;
+        return true;
+    }  // GetData()
 }
