@@ -84,16 +84,26 @@ public class DataBuffer
     /// </summary>
     public void UpdateMsgLengthAndType()
     {
-        if (_msgLength == 0 && _curBuffPosition >= Constants.HEAD_LEN)
+        if (_curBuffPosition < Constants.HEAD_LEN)
         {
-            byte[] tmpMsgLen = new byte[Constants.HEAD_MSG_LEN];
-            Array.Copy(_buff, 0, tmpMsgLen, 0, Constants.HEAD_MSG_LEN);
-            _msgLength = BitConverter.ToUInt32(tmpMsgLen, 0);
-
-            byte[] tmpProtocalType = new byte[Constants.HEAD_TYPE_LEN];
-            Array.Copy(_buff, Constants.HEAD_MSG_LEN, tmpProtocalType, 0, Constants.HEAD_TYPE_LEN);
-            _protocalType = BitConverter.ToUInt16(tmpProtocalType, 0);
+            return;
         }
+
+        byte[] tmpMsgLen = new byte[Constants.HEAD_MSG_LEN];
+        Array.Copy(_buff, 0, tmpMsgLen, 0, Constants.HEAD_MSG_LEN);
+        _msgLength = BitConverter.ToUInt32(tmpMsgLen, 0);
+        if (_msgLength > Constants.MAX_MSG_LEN)
+        {
+            throw new Exception("Message length is too large.");
+        }
+        if (_msgLength < Constants.HEAD_TYPE_LEN)
+        {
+            throw new Exception("Message length is too small.");
+        }
+
+        byte[] tmpProtocalType = new byte[Constants.HEAD_TYPE_LEN];
+        Array.Copy(_buff, Constants.HEAD_MSG_LEN, tmpProtocalType, 0, Constants.HEAD_TYPE_LEN);
+        _protocalType = BitConverter.ToUInt16(tmpProtocalType, 0);
     }
 
     /// <summary>
@@ -112,7 +122,6 @@ public class DataBuffer
             {
                 return false;
             }
-            // XXX if (_msgLength > Constants.MAX_MSG_LEN)
         }
 
         if (_curBuffPosition < _msgLength + Constants.HEAD_MSG_LEN)
@@ -121,11 +130,6 @@ public class DataBuffer
         }
 
         int dataLength = (int)_msgLength - Constants.HEAD_TYPE_LEN;
-        if (dataLength < 0)
-        {
-            return false;
-        }
-
         _tmpSocketData._protocallType = (eProtocalCommand)_protocalType;
         _tmpSocketData._data = new byte[dataLength];
         Array.Copy(_buff, Constants.HEAD_LEN, _tmpSocketData._data, 0, dataLength);
