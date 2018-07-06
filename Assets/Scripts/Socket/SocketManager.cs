@@ -186,7 +186,7 @@ public class SocketManager
     /// <param name="_protocalType"></param>
     /// <param name="_data"></param>
     /// <returns></returns>
-    private sSocketData BytesToSocketData(eProtocalCommand _protocalType, byte[] _data)
+    private sSocketData BytesToSocketData(UInt16 _protocalType, byte[] _data)
     {
         sSocketData tmpSocketData = new sSocketData();
         tmpSocketData._protocallType = _protocalType;
@@ -221,7 +221,7 @@ public class SocketManager
     /// <param name="_protocalType"></param>
     /// <param name="_data"></param>
     /// <returns></returns>
-    private byte[] DataToBytes(eProtocalCommand _protocalType, byte[] _data)
+    private byte[] DataToBytes(UInt16 _protocalType, byte[] _data)
     {
         return SocketDataToBytes(BytesToSocketData(_protocalType, _data));
     }
@@ -282,7 +282,7 @@ public class SocketManager
     /// </summary>
     /// <param name="_protocalType"></param>
     /// <param name="_data"></param>
-    private void SendMsgBase(eProtocalCommand _protocalType, byte[] _data)
+    private void SendMsgBase(UInt16 _protocalType, byte[] _data)
     {
         if (clientSocket == null || !clientSocket.Connected)
         {
@@ -299,7 +299,7 @@ public class SocketManager
     /// </summary>
     /// <param name="_protocalType"></param>
     /// <param name="_byteStreamBuff"></param>
-    public void SendMsg(eProtocalCommand _protocalType, ByteStreamBuff _byteStreamBuff)
+    public void SendMsg(UInt16 _protocalType, ByteStreamBuff _byteStreamBuff)
     {
         SendMsgBase(_protocalType, _byteStreamBuff.ToArray());
     }
@@ -309,7 +309,7 @@ public class SocketManager
     /// </summary>
     /// <param name="_protocalType"></param>
     /// <param name="data"></param>
-    public void SendMsg(eProtocalCommand _protocalType, ProtoBuf.IExtensible data)
+    public void SendMsg(UInt16 _protocalType, ProtoBuf.IExtensible data)
     {
         SendMsgBase(_protocalType, ProtoBuf_Serializer(data));
     }

@@ -18,7 +18,7 @@ public struct sEvent_GameLogicData
 
 public struct sEvent_NetMessageData
 {
-    public eProtocalCommand _eventType;
+    public UInt16 _eventType;
     public byte[] _eventData;
 }
 
@@ -27,14 +27,14 @@ public delegate void Callback_NetMessage_Handle(byte[] _data);
 
 public class MessageCenter : SingletonMonoBehaviour<MessageCenter>
 {
-    private Dictionary<eProtocalCommand, Callback_NetMessage_Handle> _netMessage_EventList = new Dictionary<eProtocalCommand, Callback_NetMessage_Handle>();
+    private Dictionary<UInt16, Callback_NetMessage_Handle> _netMessage_EventList = new Dictionary<UInt16, Callback_NetMessage_Handle>();
     public Queue<sEvent_NetMessageData> _netMessageDataQueue = new Queue<sEvent_NetMessageData>();
 
     private Dictionary<eGameLogicEventType, Callback_GameLogic_Handle> _gameLogic_EventList = new Dictionary<eGameLogicEventType, Callback_GameLogic_Handle>();
     public Queue<sEvent_GameLogicData> _gameLogicDataQueue = new Queue<sEvent_GameLogicData>();
 
     //添加网络事件观察者
-    public void addObsever(eProtocalCommand _protocalType, Callback_NetMessage_Handle _callback)
+    public void addObsever(UInt16 _protocalType, Callback_NetMessage_Handle _callback)
     {
         if (_netMessage_EventList.ContainsKey(_protocalType))
         {
@@ -46,7 +46,7 @@ public class MessageCenter : SingletonMonoBehaviour<MessageCenter>
         }
     }
     //删除网络事件观察者
-    public void removeObserver(eProtocalCommand _protocalType, Callback_NetMessage_Handle _callback)
+    public void removeObserver(UInt16 _protocalType, Callback_NetMessage_Handle _callback)
     {
         if (_netMessage_EventList.ContainsKey(_protocalType))
         {

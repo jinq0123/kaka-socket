@@ -25,7 +25,7 @@ public class Constants
 public struct sSocketData
 {
     public byte[] _data;
-    public eProtocalCommand _protocallType;
+    public UInt16 _protocallType;
 }
 
 /// <summary>
@@ -130,7 +130,7 @@ public class DataBuffer
         }
 
         int dataLength = (int)_msgLength - Constants.HEAD_TYPE_LEN;
-        _tmpSocketData._protocallType = (eProtocalCommand)_protocalType;
+        _tmpSocketData._protocallType = _protocalType;
         _tmpSocketData._data = new byte[dataLength];
         Array.Copy(_buff, Constants.HEAD_LEN, _tmpSocketData._data, 0, dataLength);
         int doneLength = (int)_msgLength + Constants.HEAD_MSG_LEN;

@@ -19,15 +19,15 @@ public class Client : MonoBehaviour {
     void OnEnable()
     {
         MessageCenter.Instance.AddEventListener(eGameLogicEventType.NoticeInfo, CallBack_PoseEvent);
-        MessageCenter.Instance.addObsever(eProtocalCommand.sc_protobuf_login, CallBack_ProtoBuff_LoginServer);
-        MessageCenter.Instance.addObsever(eProtocalCommand.sc_binary_login, CallBack_Binary_LoginServer);
+        MessageCenter.Instance.addObsever(ProtoID.sc_protobuf_login, CallBack_ProtoBuff_LoginServer);
+        MessageCenter.Instance.addObsever(ProtoID.sc_binary_login, CallBack_Binary_LoginServer);
     }
 
     void OnDisable()
     {
         MessageCenter.Instance.RemoveEventListener(eGameLogicEventType.NoticeInfo, CallBack_PoseEvent);
-        MessageCenter.Instance.removeObserver(eProtocalCommand.sc_protobuf_login, CallBack_ProtoBuff_LoginServer);
-        MessageCenter.Instance.removeObserver(eProtocalCommand.sc_binary_login, CallBack_Binary_LoginServer);
+        MessageCenter.Instance.removeObserver(ProtoID.sc_protobuf_login, CallBack_ProtoBuff_LoginServer);
+        MessageCenter.Instance.removeObserver(ProtoID.sc_binary_login, CallBack_Binary_LoginServer);
     }
 
     void OnApplicationQuit()
@@ -66,7 +66,7 @@ public class Client : MonoBehaviour {
         gprotocol.CS_LOGINSERVER _cs_loginServer = new gprotocol.CS_LOGINSERVER();
         _cs_loginServer.account = "ProtoBuf_LogicData";
         _cs_loginServer.password = "ProtoBuf_123456";
-        SocketManager.Instance.SendMsg(eProtocalCommand.sc_protobuf_login, _cs_loginServer);
+        SocketManager.Instance.SendMsg(ProtoID.sc_protobuf_login, _cs_loginServer);
     }
     
     private void OnButton_Binary_SendMsg()
@@ -76,7 +76,7 @@ public class Client : MonoBehaviour {
         _tmpbuff.Write_Float(99.99f);
         _tmpbuff.Write_UniCodeString("Claine");
         _tmpbuff.Write_UniCodeString("123456");
-        SocketManager.Instance.SendMsg(eProtocalCommand.sc_binary_login, _tmpbuff);
+        SocketManager.Instance.SendMsg(ProtoID.sc_binary_login, _tmpbuff);
     }
 
 
