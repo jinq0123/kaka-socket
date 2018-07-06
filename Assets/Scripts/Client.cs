@@ -89,7 +89,7 @@ public class Client : MonoBehaviour {
 
     private void CallBack_ProtoBuff_LoginServer(byte[] _msgData)
     {
-        gprotocol.CS_LOGINSERVER _tmpLoginServer = SocketManager.ProtoBuf_Deserialize<gprotocol.CS_LOGINSERVER>(_msgData);
+        var _tmpLoginServer = SocketManager.DeserializePb<gprotocol.CS_LOGINSERVER>(_msgData);
         Debug.Log(_tmpLoginServer.account);
         Debug.Log(_tmpLoginServer.password);
     }

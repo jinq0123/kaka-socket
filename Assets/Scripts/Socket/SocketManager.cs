@@ -232,7 +232,7 @@ public class SocketManager
     /// </summary>
     /// <param name="data"></param>
     /// <returns></returns>
-    public static byte[] ProtoBuf_Serializer(ProtoBuf.IExtensible data)
+    public static byte[] SerializePb(ProtoBuf.IExtensible data)
     {
         using (MemoryStream m = new MemoryStream())
         {
@@ -252,7 +252,7 @@ public class SocketManager
     /// <typeparam name="T"></typeparam>
     /// <param name="_data"></param>
     /// <returns></returns>
-    public static T ProtoBuf_Deserialize<T>(byte[] _data)
+    public static T DeserializePb<T>(byte[] _data)
     {
         using (MemoryStream m = new MemoryStream(_data))
         {
@@ -311,7 +311,7 @@ public class SocketManager
     /// <param name="data"></param>
     public void SendMsg(UInt16 _protocalType, ProtoBuf.IExtensible data)
     {
-        SendMsgBase(_protocalType, ProtoBuf_Serializer(data));
+        SendMsgBase(_protocalType, SerializePb(data));
     }
 
     public void Close()
